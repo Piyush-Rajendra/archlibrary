@@ -14,7 +14,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, remember }),
@@ -22,6 +22,9 @@ const LoginPage: React.FC = () => {
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message || 'Login failed');
+      }
+      else {
+       alert("Logged In")
       }
       router.push('/dashboard');
     } catch (err: any) {
