@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Node modules
+frontend/node_modules/
+
+# Next.js build output
+frontend/.next/
+
+# Editor files
+.vscode/
+.DS_Store
+
+# Env files
+*.env
