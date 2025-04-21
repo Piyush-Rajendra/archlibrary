@@ -22,20 +22,34 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired 
+    private LoginAttemptService attemptService;
+
     public User register(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
     public String login(LoginRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+        String email = request.getEmail().toLowerCase(); // Normalize for consistent key
+    
+        if (attemptService.isBlocked(email)) {
+            return "Account temporarily locked due to too many failed login attempts.";
+        }
+    
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
             if (encoder.matches(request.getPassword(), user.getPassword())) {
-                return jwtUtil.generateToken(user.getEmail());
+                attemptService.loginSucceeded(email); 
+                return jwtUtil.generateToken(email);
             }
         }
-        return null; 
+    
+        attemptService.loginFailed(email); 
+        int remaining = attemptService.getRemainingAttempts(email);
+        return "Invalid credentials. Remaining attempts: " + remaining;
     }
+    
     
 }
