@@ -4,6 +4,9 @@ import com.example.archlibrary.dto.LoginRequest;
 import com.example.archlibrary.model.User;
 import com.example.archlibrary.service.AuthService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
+        String token = authService.login(request);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
+
 }

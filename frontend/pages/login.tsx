@@ -13,26 +13,34 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+  
     try {
       const res = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, remember }),
+        body: JSON.stringify({ email, password })
       });
+  
+      const data = await res.json();
+  
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || 'Invalid email or password');
       }
-      else {
-       alert("Logged In")
-      }
+  
+      localStorage.setItem('token', data);
+  
+      console.log("JWT Token:", data);
+  
+      alert("Login successful!");
       router.push('/dashboard');
+  
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An error occurred while logging in.');
     } finally {
       setIsLoading(false);
     }
   };
+  ;
 
   return (
     <div className="wrapper">
