@@ -1,4 +1,5 @@
 package com.example.archlibrary.controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);

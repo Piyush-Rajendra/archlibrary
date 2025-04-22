@@ -1,16 +1,20 @@
 package com.example.archlibrary.jwt;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import com.example.archlibrary.service.UserDetailsServiceImpl;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.example.archlibrary.service.UserDetailsServiceImpl;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -22,25 +26,31 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserDetailsServiceImpl userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
-        
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
-            System.out.println("JWT Header: " + authHeader);
-            System.out.println("Raw Token: " + jwt);
-            System.out.println("Is Token Valid: " + jwtUtil.isValid(jwt));
+
             if (jwtUtil.isValid(jwt)) {
                 String email = jwtUtil.extractEmail(jwt);
+                String role = jwtUtil.extractRole(jwt); // ✅ new: extract role claim
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userDetails,
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())) // ✅ required for @PreAuthorize
+                );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        
+
         filterChain.doFilter(request, response);
     }
 }
