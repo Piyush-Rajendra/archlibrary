@@ -40,37 +40,19 @@ const ReturnPage: React.FC<ReturnPageProps> = ({ refreshBorrowedBooks }) => {
     }
   }, []);
 
-  // Fetch active borrowed books
   const fetchActiveBorrowedBooks = async (authToken: string, userId: number) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/borrowed/user/${userId}/active`, {
+      const res = await fetch(`http://localhost:8080/api/borrowed/user/${userId}/details`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      const data: BorrowedBookRaw[] = await res.json();
-
-      // Fetch book details for each borrowed book
-      const books: BorrowedBook[] = await Promise.all(
-        data.map(async (borrowed) => {
-          const bookRes = await fetch(`http://localhost:8080/api/books/${borrowed.bookID}`, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
-          const book: Book = await bookRes.json();
-          return {
-            ...borrowed,
-            title: book.title,
-            author: book.author,
-            genre: book.genre,
-          };
-        })
-      );
-
-      setBorrowedBooks(books);
+      const data = await res.json();
+      setBorrowedBooks(data);
     } catch (e) {
       console.error('Error fetching borrowed books:', e);
     }
   };
+  
 
-  // Handle book return
   const returnBook = async (bookId: number) => {
     if (!token || !userId) return;
     try {
@@ -78,20 +60,23 @@ const ReturnPage: React.FC<ReturnPageProps> = ({ refreshBorrowedBooks }) => {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (res.ok) {
-        alert('Book returned successfully!');
-        // Refresh the borrowed books list to reflect the update
-        fetchActiveBorrowedBooks(token, userId);
-        refreshBorrowedBooks(); // Call the function passed down to update the parent component's state
-      } else {
+  
+      if (!res.ok) {
         const error = await res.text();
-        alert(`Failed to return book: ${error}`);
+        throw new Error(`Failed to return book: ${error}`);
       }
-    } catch (e) {
-      alert('Error while returning book.');
+  
+      alert('Book returned successfully!');
+  
+      await fetchActiveBorrowedBooks(token, userId);
+      refreshBorrowedBooks();
+  
+    } catch (e: any) {
+      console.error('Error while returning book:', e);
+      alert(e.message || 'Error while returning book.');
     }
   };
+  
 
   return (
     <div className="wrapper">

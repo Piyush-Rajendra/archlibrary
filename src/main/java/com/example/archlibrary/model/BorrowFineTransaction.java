@@ -6,6 +6,7 @@ import lombok.*;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "BorrowFineTransaction") 
 @AllArgsConstructor
 public class BorrowFineTransaction {
 

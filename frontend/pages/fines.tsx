@@ -38,31 +38,30 @@ const FinesPage: React.FC = () => {
     }
   };
 
-  // Handle paying a fine
   const payFine = async (fineId: number) => {
-    if (!token || !userId) return;
+    if (!token) return;
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/fines/pay?fineId=${fineId}&userId=${userId}`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      if (res.ok) {
-        alert('Fine paid successfully!');
-        fetchFines(token, userId);  // Refresh the fines list
-      } else {
+      const res = await fetch(`http://localhost:8080/api/fines/${fineId}/pay`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) {
         const error = await res.text();
-        alert(`Failed to pay fine: ${error}`);
+        throw new Error(`Failed to pay fine: ${error}`);
       }
-    } catch (e) {
-      alert('Error while paying fine.');
+  
+      alert('Fine paid successfully!');
+      fetchFines(token, userId!);  // Refresh fine list after paying
+  
+    } catch (e: any) {
+      console.error('Error paying fine:', e);
+      alert(e.message || 'Error while paying fine.');
     }
   };
+  
 
   return (
     <div className="wrapper">

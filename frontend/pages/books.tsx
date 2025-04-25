@@ -100,7 +100,8 @@ const BookSearchPage: React.FC = () => {
       );
       if (res.ok) {
         alert('Book returned successfully!');
-        fetchBorrowed(token, userId); // Refresh borrowed books after return
+        await fetchBorrowed(token, userId); // ✅ Refresh borrowed books
+        await fetchBooks(token); // ✅ Refresh available books
       } else {
         const error = await res.text();
         alert(`Failed to return book: ${error}`);
@@ -109,13 +110,13 @@ const BookSearchPage: React.FC = () => {
       alert('Error while returning book.');
     }
   };
+  
 
-  // Check if the book is available for borrowing
   const isBookAvailable = (bookId: number) => {
-    // Check if book is borrowed and not returned yet
     const borrowedBook = borrowedBooks.find((book) => book.bookID === bookId);
     return !borrowedBook || borrowedBook.returnDate !== null;
   };
+  
 
   return (
     <div className="wrapper">
@@ -152,7 +153,7 @@ const BookSearchPage: React.FC = () => {
               )}
 
               {/* Add Return Button */}
-              {borrowedBooks.some((bookObj) => bookObj.bookID === book.bookID) && (
+              {borrowedBooks.some((bookObj) => bookObj.bookID === book.bookID && bookObj.returnDate === null) && (
                 <button onClick={() => returnBook(book.bookID)}>Return</button>
               )}
             </div>

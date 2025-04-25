@@ -22,21 +22,20 @@ interface JwtPayload {
   }
   
   export const getUserFromToken = () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) return null;
-    const decoded = parseJwt(token);
-    if (!decoded) return null;
-  
-    if (decoded.exp * 1000 < Date.now()) {
-      localStorage.removeItem('token');
-      return null;
-    }
-  
+    if (typeof window === "undefined") return null;
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+    const role = localStorage.getItem('role');
+    const userId = localStorage.getItem('userId');
+    
+    if (!token || !email || !role || !userId) return null;
+    
     return {
-      email: decoded.sub,
-      role: decoded.role || 'UNKNOWN',
-      id: decoded.id,       
       token,
+      email,
+      role,
+      id: Number(userId),
     };
   };
+  
   

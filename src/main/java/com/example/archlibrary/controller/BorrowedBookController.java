@@ -1,5 +1,6 @@
 package com.example.archlibrary.controller;
 
+import com.example.archlibrary.dto.BorrowedBookDetailsDTO;
 import com.example.archlibrary.model.BorrowedBook;
 import com.example.archlibrary.service.BorrowedBookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,10 @@ public class BorrowedBookController {
     @GetMapping("/overdue")
     public List<BorrowedBook> getOverdueBooks() {
         return borrowedBookService.getOverdueBooks();
+    }
+
+    @GetMapping("/user/{userId}/details")
+    public List<BorrowedBookDetailsDTO> getBorrowedBooksWithDetails(@PathVariable int userId) {
+        return borrowedBookService.getBorrowedBooksWithDetails(userId);
     }
 }

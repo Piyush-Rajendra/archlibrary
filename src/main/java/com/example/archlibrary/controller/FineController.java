@@ -36,5 +36,17 @@ public class FineController {
         return ResponseEntity.ok(fineService.payFine(fineId));
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    @GetMapping
+    public List<Fine> getAllFines() {
+        return fineService.getAllFines();
+    }
+
+    @PreAuthorize("hasRole('LIBRARIAN')")
+    @GetMapping("/unpaid")
+    public List<Fine> getAllUnpaidFines() {
+        return fineService.getAllUnpaidFines();
+    }
+
 }
 

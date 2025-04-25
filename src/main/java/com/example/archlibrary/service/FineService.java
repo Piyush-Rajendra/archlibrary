@@ -27,5 +27,13 @@ public class FineService {
         fineRepo.save(fine);
         return "Fine marked as paid.";
     }
+
+    public List<Fine> getAllFines() {
+        return fineRepo.findAll();
+    }
+
+    public List<Fine> getAllUnpaidFines() {
+        return fineRepo.findByStatus("Unpaid");
+    }
 }
 

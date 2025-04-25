@@ -27,36 +27,15 @@ const BorrowedBooksPage: React.FC = () => {
 
   const fetchBorrowedBooks = async (authToken: string, userId: number) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/borrowed/user/${userId}`, {
+      const res = await fetch(`http://localhost:8080/api/borrowed/user/${userId}/details`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      const borrowedData = await res.json();
-
-      // Fetch the details of the books for each borrowed entry
-      const booksWithDetails = await Promise.all(
-        borrowedData.map(async (borrowed: any) => {
-          const bookRes = await fetch(`http://localhost:8080/api/books/${borrowed.bookID}`, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          });
-          const book = await bookRes.json();
-
-          return {
-            borrowedID: borrowed.borrowedID,
-            bookID: borrowed.bookID,
-            borrowDate: borrowed.borrowDate,
-            dueDate: borrowed.dueDate,
-            returnDate: borrowed.returnDate,
-            title: book.title,
-            author: book.author,
-          };
-        })
-      );
-
-      setBorrowedBooks(booksWithDetails);
+      const data = await res.json();
+      setBorrowedBooks(data);
     } catch (e) {
       console.error('Error fetching borrowed books:', e);
     }
-  };
+  };;
 
   const handleReturnBook = async (bookID: number) => {
     if (!token || !userId) return;

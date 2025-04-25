@@ -28,6 +28,10 @@ const LoginPage: React.FC = () => {
       }
   
       localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('email', data.email);
+      localStorage.setItem('role', data.role);
+
   
       console.log("JWT Token:", data);
       router.push('/dashboard');

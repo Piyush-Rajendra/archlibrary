@@ -15,4 +15,5 @@ public interface BorrowedBookRepository extends JpaRepository<BorrowedBook, Inte
     List<BorrowedBook> findByUserID(int userId);
     List<BorrowedBook> findByUserIDAndReturnDateIsNull(int userId);
     List<BorrowedBook> findByReturnDateIsNullAndDueDateBefore(LocalDate date);
+    
 }

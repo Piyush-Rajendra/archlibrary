@@ -25,18 +25,29 @@ const Dashboard = () => {
             <p><strong>Email:</strong> {user.email}</p>
             <p><strong>Role:</strong> {user.role}</p>
             <div className="menu">
-              <a href="/books">📚 Search Books</a>
-              <a href="/profile">👤 Your Profile</a>
-              <a href="/borrowed">📦 Borrowed Books</a>
-              <a href="/return">🔁 Return Book</a>
-              <a href="/fines">💸 View Fines</a>
-              {user.role === 'LIBRARIAN' && <a href="/admin">🛠 Admin Panel</a>}
+              {user.role !== 'LIBRARIAN' ? (
+                <>
+                  <a href="/books">📚 Search Books</a>
+                  <a href="/profile">👤 Your Profile</a>
+                  <a href="/borrowed">📦 Borrowed Books</a>
+                  <a href="/return">🔁 Return Book</a>
+                  <a href="/fines">💸 View Fines</a>
+                </>
+              ) : (
+                <>
+                  <h3>Admin Panel</h3>
+                  <a href="/admin/fines">💸 Manage Fines</a>
+                  <a href="/admin/add-book">➕ Add New Book</a>
+                  <a href="/admin/update-book">✏️ Update Book</a>
+                </>
+              )}
             </div>
           </>
         ) : (
           <p>Loading...</p>
         )}
       </div>
+
       <style jsx>{`
         .wrapper {
           background: #f0f0f0;
@@ -71,6 +82,11 @@ const Dashboard = () => {
         }
         a:hover {
           background: #333;
+        }
+        h3 {
+          margin-bottom: 16px;
+          font-size: 1.3rem;
+          color: #333;
         }
       `}</style>
     </div>
