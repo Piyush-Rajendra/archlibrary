@@ -1,72 +1,180 @@
-# ArchLibrary Backend
+# ArchLibrary - Full Stack Application
 
-This is the Spring Boot backend for **ArchLibrary**, a secure and scalable online library management system. It includes features like:
+## Project Overview
 
-- Secure User Registration and Login with JWT
-- SQL Injection prevention via Spring Data JPA
-- Book search by genre
-- Book availability updates
-- Borrow book functionality using database transactions
-- Brute-force login protection
+ArchLibrary is an online library management system built using:
 
----
+- **Backend:** Spring Boot (Java 17), MySQL
+- **Frontend:** Next.js (React with TypeScript)
+- **Authentication:** JWT (JSON Web Tokens)
+- **Database:** MySQL 8+
+- **Deployment:** Localhost (can be easily extended to AWS or GCP)
 
-| Tool | Purpose | Download |
-|------|---------|----------|
-| **Java JDK (17+)** | Compiles and runs Spring Boot backend | [Adoptium JDK 17](https://adoptium.net/en-GB/temurin/releases/?version=17) |
-| **Maven** | Builds the project and manages dependencies | [Apache Maven](https://maven.apache.org/download.cgi) *(if not using mvnw wrapper)* |
-| **MySQL** | Database to store users, books, transactions | [XAMPP](https://www.apachefriends.org/index.html) *(includes MySQL & phpMyAdmin)* or [MySQL Installer](https://dev.mysql.com/downloads/installer/) |
-| **VS Code** (or IntelliJ) | Code editor for Java/Spring | [VS Code](https://code.visualstudio.com/) |
-| **Postman** | API testing (register/login, borrow, etc.) | [Postman](https://www.postman.com/downloads/) |
-
-## Dependencies Used
-
-- Java 17
-- Spring Boot
-- Spring Security
-- Spring Data JPA
-- MySQL
-- JWT (jjwt)
+The application supports user registration, authentication, borrowing and returning books, fine management, and admin-specific functionality.
 
 ---
 
-## Getting Started
+## Backend Setup (Spring Boot)
 
-### 1. Clone the Repository
+### 1. Prerequisites
 
-```bash
-git clone https://github.com/YOUR_USERNAME/archlibrary.git
-cd archlibrary-backend
+- Java 17+
+- Maven 3.8+
+- MySQL 8+
+- IDE (IntelliJ IDEA / Eclipse / VS Code)
 
----
+### 2. Database Setup
 
-### 2.MySQL Setup (XAMPP or standalone MySQL)
-Start MySQL server (XAMPP or MySQL Workbench)
-Create a new database named: archlibrary
----
-### 3. Configure application.properties
-Open src/main/resources/application.properties and update your DB credentials:
+- Create a MySQL database named `archlibrary`.
+
+```sql
+CREATE DATABASE archlibrary;
+```
+
+- In your `application.properties` (or `application.yml`) configure:
+
+```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/archlibrary
-spring.datasource.username=root
-spring.datasource.password=your_password_here
+spring.datasource.username=your_mysql_username
+spring.datasource.password=your_mysql_password
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 server.port=8080
+```
+
+### 3. Running the Backend
+
+- Navigate to the backend root folder.
+- Run the following command:
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+The backend will start on:
+
+```
+http://localhost:8080
+```
+
+### 4. Important Backend Notes
+
+- JWT Authentication is enabled via a custom `JwtFilter`.
+- CORS is configured to allow requests from `http://localhost:3000`.
+- `@Table(name = "BorrowedBook")` and similar annotations are added to prevent Hibernate auto-splitting table names.
+- Borrowing and Returning books automatically adjust available copies.
+- Overdue returns automatically generate unpaid fines.
+
 ---
-### 4. Run the App
-    Option A: Using VS Code or IDE
-    Open the project in VS Code or IntelliJ
-    Run ArchLibraryApplication.java
-    
-    Option B: Using Terminal
-    ./mvnw spring-boot:run     # Linux/Mac
-    mvnw.cmd spring-boot:run   # Windows PowerShell
 
-or if Maven is globally installed:
-    mvn spring-boot:run
+## Frontend Setup (Next.js)
+
+### 1. Prerequisites
+
+- Node.js 18+
+- npm 9+
+- IDE (VS Code recommended)
+
+### 2. Installation
+
+- Navigate to the frontend root folder.
+- Install dependencies:
+
+```bash
+npm install
+```
+
+### 3. Running the Frontend
+
+```bash
+npm run dev
+```
+
+The frontend will start on:
+
+```
+http://localhost:3000
+```
+
+### 4. Important Frontend Notes
+
+- Axios instance is configured to automatically attach Authorization headers.
+- After login, `token`, `userId`, `email`, and `role` are stored in localStorage.
+- Protected routes (like dashboard, admin panel) check for valid login status.
+- Role-based UI (Student vs Librarian) is dynamically rendered.
+
 ---
-Postman link: https://epoch8-2961.postman.co/workspace/Epoch-Workspace~8bb9eea6-464b-404a-8b1f-da6d8b2dad75/collection/27181948-d9613df6-049f-4d3d-a23c-e173a46bb611?action=share&creator=27181948&active-environment=27181948-7dc16bba-28f4-43f0-8a59-b98bbb13f097
 
+## How to Use the Application
 
+### 1. Registration and Login
+
+- Visit `/register` to create a new account.
+- Choose the role: Student or Librarian.
+- Login via `/login` after registration.
+
+### 2. Student Functionalities
+
+- Search available books.
+- Borrow and return books.
+- View active and historical borrowed books.
+- View outstanding fines.
+
+### 3. Librarian Functionalities
+
+- Manage books: Add, Update.
+- Manage fines: View all active fines and mark fines as paid.
+- View and manage borrowed book transactions.
+
+---
+
+## Key API Endpoints
+
+### Authentication
+
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and receive JWT + user details
+
+### Books
+
+- `GET /api/books` - List all books
+- `GET /api/books/search?title=xyz` - Search books by title
+- `POST /api/books` - Add new book (Librarian only)
+- `PUT /api/books/{bookId}` - Update book details (Librarian only)
+
+### Borrowing
+
+- `POST /api/library/borrow?userId=...&bookId=...` - Borrow a book
+- `POST /api/library/return?userId=...&bookId=...` - Return a book
+
+### Fines
+
+- `GET /api/fines/user/{userId}` - Get fines for a specific user
+- `PUT /api/fines/{fineId}/pay` - Pay a specific fine (Librarian)
+- `GET /api/fines` - List all fines (Librarian)
+
+### Borrowed Books
+
+- `GET /api/borrowed/user/{userId}` - Get borrowed books for user
+- `GET /api/borrowed/user/{userId}/active` - Get active borrowed books for user
+- `GET /api/borrowed/overdue` - Get all overdue borrowed books
+- `GET /api/borrowed/user/{userId}/details` - Get borrowed book details including book metadata
+
+---
+
+## Important Development Notes
+
+- Always ensure backend is running before frontend.
+- Frontend expects all API endpoints to be served at `localhost:8080`.
+- If modifying authentication flows, update both JWT token creation and parsing accordingly.
+- Consider using environment variables for production deployment.
+
+---
+
+---
+
+## Contact
+
+For any queries, issues, or contributions, please contact the project maintainer or open an issue in the repository.
 
