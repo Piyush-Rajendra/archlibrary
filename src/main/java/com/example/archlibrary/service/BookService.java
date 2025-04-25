@@ -17,6 +17,11 @@ public class BookService {
         return bookRepo.findAll();
     }
 
+    public Book getBookById(int id) {
+        return bookRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+    }
+
     public List<Book> searchByTitle(String title) {
         return bookRepo.findByTitleContainingIgnoreCase(title);
     }

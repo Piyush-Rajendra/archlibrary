@@ -42,7 +42,7 @@ public class AuthService {
             User user = userOpt.get();
             if (encoder.matches(request.getPassword(), user.getPassword())) {
                 attemptService.loginSucceeded(email); 
-                return jwtUtil.generateToken(user.getEmail(), user.getRole());
+                return jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
             }
         }
     

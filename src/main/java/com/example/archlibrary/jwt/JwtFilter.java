@@ -34,11 +34,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
+            System.out.println("Extracted JWT: " + jwt);
+            System.out.println("Is valid: " + jwtUtil.isValid(jwt));
 
             if (jwtUtil.isValid(jwt)) {
                 String email = jwtUtil.extractEmail(jwt);
-                String role = jwtUtil.extractRole(jwt); // ✅ new: extract role claim
-
+                String role = jwtUtil.extractRole(jwt); 
+                System.out.println("Email from JWT: " + email);
+        System.out.println("Role from JWT: " + role);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

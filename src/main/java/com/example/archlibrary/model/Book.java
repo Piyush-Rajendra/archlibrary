@@ -16,6 +16,8 @@ public class Book {
     private String author;
     private String isbn;
     private String genre;
-    private int totalCopies;
-    private int availableCopies;
+    @Column(name = "total_copies", nullable = false)
+    private Integer totalCopies = 0;
+    @Column(name = "available_copies", nullable = false)
+    private Integer availableCopies = 0;
 }

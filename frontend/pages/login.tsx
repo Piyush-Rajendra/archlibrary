@@ -27,11 +27,9 @@ const LoginPage: React.FC = () => {
         throw new Error(data.message || 'Invalid email or password');
       }
   
-      localStorage.setItem('token', data);
+      localStorage.setItem('token', data.token);
   
       console.log("JWT Token:", data);
-  
-      alert("Login successful!");
       router.push('/dashboard');
   
     } catch (err: any) {

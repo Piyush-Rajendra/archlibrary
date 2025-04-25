@@ -18,6 +18,9 @@ public class Transaction {
     private int userID;
     private int bookID;
 
-    private String transactionType; // "Borrow" or "Return"
+    private String transactionType; 
     private LocalDateTime timestamp;
+
+    @Column(nullable = true)
+    private LocalDateTime returnDate; 
 }
